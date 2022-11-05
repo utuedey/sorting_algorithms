@@ -1,56 +1,57 @@
 #include "sort.h"
 
-
 /**
- * radix_sort - sorts an array following the Radix sort algorithm
+ * heap_sort - sorts an array following the Heap sort algorithm
  * @array: array of ints to sort
- * @size: size of the array
+ * @size: size of the array to sort
  */
 
-void radix_sort(int *array, size_t size)
+void heap_sort(int *array, size_t size)
 {
-int max;
-size_t i, lsd;
-if (!array || size < 2)
+int i;
+int tmp;
+if (size < 2)
 return;
-max = 0;
-
-for (i = 0; i < size; i++)
-if (array[i] > max)
-max = array[i];
-
-for (lsd = 1; max / lsd > 0; lsd *= 10)
+for (i = size / 2 - 1; i >= 0; i--)
+heapify(array, size, (size_t)i, size);
+for (i = size - 1; i >= 0; i--)
 {
-count_sort_LSD(array, size, lsd);
+tmp = array[i];
+array[i] = array[0];
+array[0] = tmp;
+if (i != 0)
 print_array(array, size);
+heapify(array, (size_t)i, 0, size);
 }
 }
-
 
 /**
- * count_sort_LSD - count sort with LSD
- * @array: array to sort
- * @size: size of the array
- * @lsd: least significant digit
+ * heapify - turns an array in a heap tree
+ * @array: array to turn into heap
+ * @s: size of the subtree
+ * @root: index of the subtree in the heap
+ * @size: size of the whole array
  */
 
-void count_sort_LSD(int *array, size_t size, size_t lsd)
-
+void heapify(int *array, size_t s, size_t root, size_t size)
 {
-int count_arr[10] = {0}, *out_arr, l, m;
-size_t k, n;
+size_t max, left, right;
+int tmp;
+max = root;
+left = (root * 2) + 1;
+right = (root * 2) + 2;
+if (left < s && array[left] > array[max])
+max = left;
 
-out_arr = malloc(sizeof(int) * size);
-for (k = 0; k < size; k++)
-count_arr[(array[k] / lsd) % 10]++;
-for (l = 1; l < 10; l++)
-count_arr[l] += count_arr[l - 1];
-for (m = size - 1; m >= 0; m--)
+if (right < s && array[right] > array[max])
+max = right;
+
+if (max != root)
 {
-out_arr[count_arr[(array[m] / lsd) % 10] - 1] = array[m];
-count_arr[(array[m] / lsd) % 10]--;
+tmp = array[root];
+array[root] = array[max];
+array[max] = tmp;
+print_array(array, size);
+heapify(array, s, max, size);
 }
-for (n = 0; n < size; n++)
-array[n] = out_arr[n];
-free(out_arr);
 }
